@@ -111,7 +111,11 @@ Configures usage of the http_proxy environment variable. There is not default
 for this setting.
 
 ####`manage_ssh [optional]`
-Configures whether or not to allow the module to manage the SSH service/package. 
+Configures whether or not to allow the module to manage the SSH service/package.
+The default is *true*.
+
+####`manage_repo [optional]`
+Configures whether or not to allow the module to add/manage the apt/yum repository.
 The default is *true*.
 
 ####`manage_pam [optinal]`
