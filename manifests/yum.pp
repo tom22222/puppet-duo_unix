@@ -26,12 +26,15 @@ class duo_unix::yum {
     $releasever = '$releasever'
   }
 
-  yumrepo { 'duosecurity':
-    descr    => 'Duo Security Repository',
-    baseurl  => "${repo_uri}/${os}/${releasever}/\$basearch",
-    gpgcheck => '1',
-    enabled  => '1',
-    require  => File['/etc/pki/rpm-gpg/RPM-GPG-KEY-DUO'];
+  if $duo_unix::manage_repo {
+    yumrepo { 'duosecurity':
+      descr    => 'Duo Security Repository',
+      baseurl  => "${repo_uri}/${os}/${releasever}/\$basearch",
+      gpgcheck => '1',
+      enabled  => '1',
+      require  => File['/etc/pki/rpm-gpg/RPM-GPG-KEY-DUO'],
+      before   => Package[$duo_unix::duo_package];
+    }
   }
 
   if $duo_unix::manage_ssh {
@@ -42,7 +45,7 @@ class duo_unix::yum {
 
   package {  $duo_unix::duo_package:
     ensure  => $package_state,
-    require => [ Yumrepo['duosecurity'], Exec['Duo Security GPG Import'] ];
+    require => [ Exec['Duo Security GPG Import'] ];
   }
 
   exec { 'Duo Security GPG Import':

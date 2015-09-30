@@ -18,30 +18,31 @@ class duo_unix::apt {
   }
 
   package { $duo_unix::duo_package:
-    ensure  => $package_state,
-    require => [
-      File[$repo_file],
-      Exec['Duo Security GPG Import'],
-      Exec['duo-security-apt-update']
-    ]
+    ensure  => $package_state
   }
 
-  file { $repo_file:
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-    content => "deb ${repo_uri}/${::operatingsystem} ${::lsbdistcodename} main",
-    notify  => Exec['duo-security-apt-update']
-  }
+  if $duo_unix::manage_repo {
+    file { $repo_file:
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => "deb ${repo_uri}/${::operatingsystem} ${::lsbdistcodename} main",
+      notify  => Exec['duo-security-apt-update'],
+      before  => Package[$duo_unix::duo_package]
+    }
 
-  exec { 'duo-security-apt-update':
-    command     => '/usr/bin/apt-get update',
-    refreshonly => true
-  }
+    exec { 'duo-security-apt-update':
+      command     => '/usr/bin/apt-get update',
+      refreshonly => true,
+      require     => File[$repo_file],
+      before      => Package[$duo_unix::duo_package]
+    }
 
-  exec { 'Duo Security GPG Import':
-    command => '/usr/bin/apt-key add /etc/apt/DEB-GPG-KEY-DUO',
-    unless  => '/usr/bin/apt-key list | grep "Duo Security"',
-    notify  => Exec['duo-security-apt-update']
+    exec { 'Duo Security GPG Import':
+      command => '/usr/bin/apt-key add /etc/apt/DEB-GPG-KEY-DUO',
+      unless  => '/usr/bin/apt-key list | grep "Duo Security"',
+      notify  => Exec['duo-security-apt-update'],
+      before  => Package[$duo_unix::duo_package]
+    }
   }
 }
