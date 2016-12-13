@@ -116,10 +116,13 @@ The default is *true*.
 
 ####`manage_repo [optional]`
 Configures whether or not to allow the module to add/manage the apt/yum repository.
+<<<<<<< HEAD
 The default is *true*.
 
 ####`manage_pam [optinal]`
 Configures whether or not to allow the module to manage the system PAM configuration.
+=======
+>>>>>>> 941610fa2019b7ad0b9353b049204b5069b0e6a0
 The default is *true*.
 
 ####`pam_unix_control [optional]`
